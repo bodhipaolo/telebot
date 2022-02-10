@@ -46,7 +46,7 @@ class Telebot:
         """
         def inner(msg_call):
             self.logger.debug('Enter inner of message_matches')
-            listener    = MessageMatchListener(msg_call, regex)
+            listener    = MessageMatchListener(msg_call, regex, self.consumer_manager)
             handler     = MessageHandler(Filters.regex(regex) & (~Filters.command), listener.listener)
             #handler    = MessageHandler(Filters.text & (~Filters.command), task.listener) 
             disp_ret    = self._dispatcher.add_handler(handler) 
@@ -58,7 +58,7 @@ class Telebot:
         """
         def inner(msg_call):
             self.logger.debug('Enter inner of message_matches')
-            listener    = MessageListener(msg_call)
+            listener    = MessageListener(msg_call, self.consumer_manager)
             handler     = MessageHandler(Filters.text & (~Filters.command), listener.listener) 
             disp_ret    = self._dispatcher.add_handler(handler) 
             return msg_call
@@ -70,7 +70,7 @@ class Telebot:
         """
         def inner(cmd_call):
             self.logger.debug('Enter inner of command decorator')
-            listener    = CallbackListener(cmd_name, cmd_call)
+            listener    = CallbackListener(cmd_name, cmd_call, self.consumer_manager)
             handler     = CallbackQueryHandler(listener.listener, pattern = cmd_name)
             disp_ret    = self._dispatcher.add_handler(handler)
             self.logger.debug('Exiting inner...')

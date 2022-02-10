@@ -4,8 +4,8 @@ import time
 sys.path.append(".")
 
 import botlog
-from Telebot import Telebot
-from ui import Buttons
+from telebot import Telebot
+from ui      import Buttons
 
 bot         = Telebot("5197893187:AAHu9nLtenZcCC9PQ_uWM05yvMd3OvJyA7w")
 bot.about   = "Working in progress of Telegram-Bot wrapped"
