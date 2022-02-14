@@ -91,7 +91,7 @@ class Telebot:
         def inner(cmd_call):
             self.logger.debug('Enter inner of command decorator')
             listener    = CallbackListener(cmd_name, cmd_call, self.consumer_manager)
-            handler     = CallbackQueryHandler(listener.listener, pattern = cmd_name)
+            handler     = CallbackQueryHandler(listener.listener, pattern = f"^{cmd_name}*")
             disp_ret    = self._dispatcher.add_handler(handler)
             self.logger.debug('Exiting inner...')
             return cmd_call

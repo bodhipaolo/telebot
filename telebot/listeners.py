@@ -1,4 +1,4 @@
- Copyright (c) --------- (see AUTHORS)
+# Copyright (c) --------- (see AUTHORS)
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -115,14 +115,14 @@ class CallbackListener(BotListener):
 	"""
 	def __init__(self, name, user_callback, consumer_manager):
 		super().__init__(user_callback, consumer_manager)
-		self.name = name
+		self.callback_name = name
 
 	def listener(self, update: Update, context: CallbackContext):
 		"""Command decoretor. It is a callback that intercept the event and map parameter for the client callback
 		"""
 		query = update.callback_query
-		if query.data == self.callback_name:
-			logger.debug (f"Enter callback listener for {self._callback_name}")
+		if query.data.startswith(self.callback_name):
+			logger.debug (f"Enter callback listener for {self.callback_name}")
 			data = query.data
 			chat = Telechat(update, context)
 			if update.message != None:

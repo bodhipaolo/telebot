@@ -22,13 +22,12 @@ class ButtonsRow:
 	"""
 
 	def __init__(self):
-		self._row = []
+		self._row =  []
 
-	def callback(self, label, call_name, callback_data):
-		if callback_data == "":
-			callback_data = call_name
+	def callback(self, label, callback_name, callback_data):
 
-		self._row.append({"text": label, "callback_data": callback_data})
+		data = f"{callback_name}_{callback_data}"
+		self._row.append({"text": label, "callback_data": data})
 
 	def url(self, label, url):
 		self._row.append({"text": label, "url": url})

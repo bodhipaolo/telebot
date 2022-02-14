@@ -67,9 +67,9 @@ def message_detection(chat, message):
 @bot.command("direct")
 def direct_command(chat, message, args):
     btns = Buttons()
-    btns[0].callback("First button", "first", "")
+    btns[0].callback("First button", "first", "provolone")
     btns[0].callback("Secondary button", "second", "")
-    btns[1].callback("Third button", "third", "")
+    btns[1].callback("Third button", "third", "caciocavallo")
     btns[2].callback("Fourth button", "fourth", "")
     if message is not None:
         logger.info("message %s" % message.text)
@@ -80,19 +80,19 @@ def direct_command(chat, message, args):
 @bot.callback("first")
 def first_callback(query, data, chat, message):
     logger.debug("Enter first")
-    chat.send("Your choice is %s" % data)
+    chat.send("Questa e' al callback first")
     if message is not None:
         logger.info("message %s" % message.text)
-    logger.debug("Exit first")
+    logger.info(f"Dati callback first = {data}")
 
 # Callback
 @bot.callback("third")
 def third_callback(query, data, chat, message):
     logger.debug("Enter third")
-    chat.send("Your choice is %s" % data)
+    chat.send("Questa e' la callback third")
     if message is not None:
         logger.info("message %s" % message.text)
-    logger.debug("Exit third")
+    logger.info(f"Dati callback third = {data}")
 
 if __name__ == "__main__":
     bot.run()
