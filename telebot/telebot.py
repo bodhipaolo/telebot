@@ -28,7 +28,7 @@ from telegram.ext   import Filters
 
 from listeners      import CommandListener
 from listeners      import MessageMatchListener
-from listeners      import MessageListener
+from listeners      import MessageContainsListener
 from listeners      import CallbackListener
 from consumers      import ConsumerManager
 import botlog       
@@ -73,12 +73,12 @@ class Telebot:
             return msg_call
         return inner
 
-    def message(self):
+    def message_contains(self, token):
         """It decorates Telegram-Bot message 
         """
         def inner(msg_call):
-            self.logger.debug('Enter inner of message_matches')
-            listener    = MessageListener(msg_call, self.consumer_manager)
+            self.logger.debug('Enter inner of message_contains')
+            listener    = MessageContainsListener(msg_call, token, self.consumer_manager)
             handler     = MessageHandler(Filters.text & (~Filters.command), listener.listener) 
             disp_ret    = self._dispatcher.add_handler(handler) 
             return msg_call
@@ -91,7 +91,7 @@ class Telebot:
         def inner(cmd_call):
             self.logger.debug('Enter inner of command decorator')
             listener    = CallbackListener(cmd_name, cmd_call, self.consumer_manager)
-            handler     = CallbackQueryHandler(listener.listener, pattern = f"^{cmd_name}*")
+            handler     = CallbackQueryHandler(listener.listener, pattern = f"^{cmd_name}_*")
             disp_ret    = self._dispatcher.add_handler(handler)
             self.logger.debug('Exiting inner...')
             return cmd_call

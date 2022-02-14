@@ -100,7 +100,7 @@ class MessageMatchTask(BotTask):
     def execute(self):
         self._user_callback(self._chat, self._message, self._matches)
 
-class MessageTask(BotTask):
+class MessageContainsTask(BotTask):
     
     def __init__(self, user_callback, chat, message):
         super().__init__(user_callback)

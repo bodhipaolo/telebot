@@ -29,7 +29,7 @@ from telechat       import Telechat
 from messages    	import TextMessage
 from consumers		import CommandTask
 from consumers		import MessageMatchTask
-from consumers		import MessageTask
+from consumers		import MessageContainsTask
 from consumers		import CallabckTask
 
 logger = botlog.get_logger(__name__)
@@ -90,24 +90,23 @@ class MessageMatchListener(BotListener):
 		self._consumer_manager.queue.put(task)
 
 
-class MessageListener(BotListener):
+class MessageContainsListener(BotListener):
 	""" Task for handling messages callback and matches
 	"""
+	def __init__(self, name, token, consumer_manager):
+		super().__init__(user_callback, consumer_manager)
+		self.token = token
 
 	def listener(self, update: Update, context: CallbackContext):
 		"""Message match decoretor. It is a callback that intercepts the event of message matching
 		"""
+		logger.info(f"Enter message listener for {message}")
 		if (update.message is not None):
-			name = update.message.text
-		logger.info(f"Enter message listener for {name}")
-		chat = Telechat(update, context)
-		if update.message != None:
-			message = TextMessage(update.message.message_id, update.message.date, update.message.text)
-		else:
-			message = None
-
-		task = MessageTask(self._user_callback, chat, message)
-		self._consumer_manager.queue.put(task)
+			if self.token in f" {update.message.text} ": 
+				chat = Telechat(update, context)
+				message = TextMessage(update.message.message_id, update.message.date, update.message.text)
+				task = MessageContainsTask(self._user_callback, chat, message)
+				self._consumer_manager.queue.put(task)
 
 
 class CallbackListener(BotListener):
@@ -121,7 +120,8 @@ class CallbackListener(BotListener):
 		"""Command decoretor. It is a callback that intercept the event and map parameter for the client callback
 		"""
 		query = update.callback_query
-		if query.data.startswith(self.callback_name):
+		prefix_data = query.data.split('_',1)[0]
+		if prefix_data == self.callback_name:
 			logger.debug (f"Enter callback listener for {self.callback_name}")
 			data = query.data
 			chat = Telechat(update, context)
