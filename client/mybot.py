@@ -35,12 +35,7 @@ logger = botlog.get_logger(__name__)
 # Command
 @bot.command("ciao")
 def ciao_command(chat, message, args):
-    logger.debug("ciao_command called")
-
-    logger.info("Printed immediately.")
-    delay = 20
-    time.sleep(delay)
-    logger.info("Printed after %d seconds." % delay)
+    logger.info("ciao_command called")
     chat.send("Ciao! Sono mybot")
     if message is not None:
         logger.info("message %s" % message.text)
@@ -56,10 +51,10 @@ def email_set(chat, message, matches):
     logger.info("matches %s" % matches)
 
 # Message
-@bot.message()
+@bot.message_contains("pippo")
 def message_detection(chat, message):
     logger.debug("Generic message")
-    chat.send("This '%s' is your message" % message.text)
+    chat.send(f"This '{message.text}' contains pippo")
     if message is not None:
         logger.info("message %s" % message.text)
 

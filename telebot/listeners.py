@@ -93,15 +93,15 @@ class MessageMatchListener(BotListener):
 class MessageContainsListener(BotListener):
 	""" Task for handling messages callback and matches
 	"""
-	def __init__(self, name, token, consumer_manager):
+	def __init__(self, user_callback, token, consumer_manager):
 		super().__init__(user_callback, consumer_manager)
 		self.token = token
 
 	def listener(self, update: Update, context: CallbackContext):
 		"""Message match decoretor. It is a callback that intercepts the event of message matching
 		"""
-		logger.info(f"Enter message listener for {message}")
 		if (update.message is not None):
+			logger.info(f"Enter message listener for {update.message.text}")
 			if self.token in f" {update.message.text} ": 
 				chat = Telechat(update, context)
 				message = TextMessage(update.message.message_id, update.message.date, update.message.text)

@@ -39,11 +39,14 @@ class Telechat:
         self._update    = update
         self.logger     = botlog.get_logger(__name__)
     
-    def _send_message(self, chat_message):
+    def _send_message(self, chat_message, chat_id):
         """ It wraps send_message API 
         """
-        self.logger.debug("Sending message '%s'" % (chat_message))
-        self._context.bot.send_message(chat_id=self._update.effective_chat.id, text=chat_message)
+        if chat_id is None:
+            chat_id = self._update.effective_chat.id
+
+        self.logger.info(f"Sending message {chat_message} to {chat_id}")
+        self._context.bot.send_message(chat_id=chat_id, text=chat_message)
         
     def _send_message_button(self, chat_message, attach=None, syntax=None):
         """ It wraps the message reply
@@ -62,9 +65,10 @@ class Telechat:
         self._update.message.reply_text(chat_message, reply_markup=reply_markup)
         self.logger.debug("Exiting from _send_message_button")
         
-    def send(self, chat_message, attach=None, syntax=None):
+    def send(self, chat_message, attach=None, syntax=None, chat_id = None):
+ 
         if attach is None:
-            self._send_message(chat_message)
+            self._send_message(chat_message, chat_id)
         else:
             self._send_message_button(chat_message, attach._serialize_attachment()["inline_keyboard"], syntax)
 
