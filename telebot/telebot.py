@@ -24,13 +24,18 @@ from telegram.ext   import CallbackContext
 from telegram.ext   import CommandHandler
 from telegram.ext   import MessageHandler
 from telegram.ext   import CallbackQueryHandler
+from telegram.ext   import ChatMemberHandler
 from telegram.ext   import Filters
 
 from listeners      import CommandListener
 from listeners      import MessageMatchListener
 from listeners      import MessageContainsListener
 from listeners      import CallbackListener
+from listeners      import ChatMemberListener
+from listeners      import InternalCommandListener
 from consumers      import ConsumerManager
+
+from internal_commands import show_chats_command
 import botlog       
 
 class Telebot:
@@ -46,6 +51,10 @@ class Telebot:
         self.logger             = botlog.get_logger(__name__)
         self.consumer_manager   = ConsumerManager()
         self.consumer_manager.initialize()
+
+    def _init_handlers(self):
+        self._chat_member()
+        self._internal_commands()
 
     def command(self, cmd_name):
         """It decorates Telegram-Bot user commands
@@ -97,9 +106,27 @@ class Telebot:
             return cmd_call
         return inner
 
+    def _chat_member(self):
+        # Handle members joining/leaving chats.
+        # Handle members joining/leaving chats.
+        self.logger.debug('Enter inner of command decorator')
+        listener    = ChatMemberListener()
+        handler     = ChatMemberHandler(listener.listener, ChatMemberHandler.ANY_CHAT_MEMBER)
+        disp_ret    = self._dispatcher.add_handler(handler)
+
+    def _internal_commands(self):
+        # Register internal commands not exposed to client
+        self.logger.debug('Enter _internal_commands')
+        call_name, callback = ("show_chats", show_chats_command)
+        listener    = InternalCommandListener(call_name, callback, self.consumer_manager)
+        handler     = CommandHandler(call_name, listener.listener)
+        disp_ret    = self._dispatcher.add_handler(handler)
+
     def run(self):
         """Enter event loop
         """
+        self.logger.info ("initialize default handlers")
+        self._init_handlers()
         self.logger.info("%s Launch consumer threads..." % (__name__))
         self.consumer_manager.start()
         self.logger.info("%s Enter event loop..." % (__name__))

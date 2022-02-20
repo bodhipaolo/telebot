@@ -110,7 +110,7 @@ class MessageContainsTask(BotTask):
     def execute(self):
         self._user_callback(self._chat, self._message)
 
-class CallabckTask(BotTask):
+class CallbackTask(BotTask):
     
     def __init__(self, user_callback, query, data, chat, message):
         super().__init__(user_callback)
@@ -121,4 +121,14 @@ class CallabckTask(BotTask):
 
     def execute(self):
         self._user_callback(self._query, self._data, self._chat, self._message)
+
+class InternalCommandTask(BotTask):
+    
+    def __init__(self, user_callback, update, context):
+        super().__init__(user_callback)
+        self._update    = update
+        self._context   = context
+
+    def execute(self):
+        self._user_callback(self._update, self._context)
 
