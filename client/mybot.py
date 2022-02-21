@@ -37,7 +37,7 @@ logger = botlog.get_logger(__name__)
 @bot.command("ciao")
 def ciao_command(chat, message, args):
     logger.info("ciao_command called")
-    chat.send("Ciao! Sono mybot prrrrrrr", )
+    chat.send("Ciao! Sono mybot")
     if message is not None:
         logger.info("message %s" % message.text)
     logger.info("args %s" % args)
