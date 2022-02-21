@@ -18,7 +18,11 @@
 #   DEALINGS IN THE SOFTWARE.
 
 from telegram       import Update
+from telegram       import Chat
 from telegram.ext   import CallbackContext
+import botlog
+
+logger = botlog.get_logger(__name__)
 
 def show_chats_command(update: Update, context: CallbackContext) -> None:
         """Shows which chats the bot is in"""
@@ -31,3 +35,36 @@ def show_chats_command(update: Update, context: CallbackContext) -> None:
             f"and administrator in the channels with IDs {channel_ids}."
         )
         update.effective_message.reply_text(text)
+
+def start_command(update: Update, context: CallbackContext) -> None:
+    username = update.effective_user.username
+    chat = update.effective_chat
+
+    logger.info(f"{username} started the chat {chat.id}")
+
+
+def start_command2(update: Update, context: CallbackContext) -> None:
+        """Bot presentation and chat initialization"""
+        # Let's check who is responsible for the change
+        username = update.effective_user.username
+
+        # Handle chat types differently:
+        chat = update.effective_chat
+        
+        if chat.type == Chat.PRIVATE:
+            logger.info(f"Add {username} user with {chat.id} chat id of individual chat")
+            context.bot_data.setdefault("user_ids", dict())
+            context.bot_data["user_ids"][username] = chat.id
+        elif chat.type in [Chat.GROUP, Chat.SUPERGROUP]:
+            logger.info(f"Add {username} user with {chat.id} chat id of {chat.title} group")
+            context.bot_data.setdefault("group_ids", dict())
+            context.bot_data["group_ids"][username] = chat.id
+        else:
+            logger.info(f"Add {username} user with {chat.id} chat id of {chat.title} channel")
+            context.bot_data.setdefault("channel_ids", dict())
+            context.bot_data["channel_ids"][username] = chat.id
+
+
+
+
+        

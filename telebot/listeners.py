@@ -22,6 +22,8 @@ from typing         import Tuple, Optional
 from queue          import Queue
 from telegram       import Update
 from telegram       import ChatMemberUpdated
+from telegram       import ChatMember
+from telegram       import Chat
 from telegram.ext   import Updater
 from telegram.ext   import CallbackContext
 from telegram.ext   import CommandHandler
@@ -177,18 +179,6 @@ class ChatMemberListener(BotListener):
 
         return was_member, is_member
 
-    def _show_chats(update: Update, context: CallbackContext) -> None:
-        """Shows which chats the bot is in"""
-        user_ids = ", ".join(str(uid) for uid in context.bot_data.setdefault("user_ids", dict()))
-        group_ids = ", ".join(str(gid) for gid in context.bot_data.setdefault("group_ids", dict()))
-        channel_ids = ", ".join(str(cid) for cid in context.bot_data.setdefault("channel_ids", dict()))
-        text = (
-            f"@{context.bot.username} is currently in a conversation with the user IDs {user_ids}."
-            f" Moreover it is a member of the groups with IDs {group_ids} "
-            f"and administrator in the channels with IDs {channel_ids}."
-        )
-        update.effective_message.reply_text(text)
-
     def _track_chats(self, update: Update, context: CallbackContext) -> None:
         """Tracks the chats the bot is in."""
         result = self._extract_status_change(update.my_chat_member)
@@ -203,29 +193,29 @@ class ChatMemberListener(BotListener):
         chat = update.effective_chat
         if chat.type == Chat.PRIVATE:
             if not was_member and is_member:
-                logger.info("%s started the bot", username)
+                logger.info(f"{username} started the chat with {context.bot.username} bot")
                 context.bot_data.setdefault("user_ids", dict())
                 context.bot_data["user_ids"][username] = chat.id
             elif was_member and not is_member:
-                logger.info("%s blocked the bot", username)
+                logger.info(f"{username} left the chat with {context.bot.username} bot")
                 context.bot_data.setdefault("user_ids", dict())
                 context.bot_data["user_ids"].pop(username, None)
 
         elif chat.type in [Chat.GROUP, Chat.SUPERGROUP]:
             if not was_member and is_member:
-                logger.info("%s added the bot to the group %s", username, chat.title)
+                logger.info(f"{username} added to the {chat.title} group")
                 context.bot_data.setdefault("group_ids", dict())
                 context.bot_data["group_ids"][username] = chat.id
             elif was_member and not is_member:
-                logger.info("%s removed the bot from the group %s", username, chat.title)
+                logger.info(f"{username} left the {chat.title} group")
                 context.bot_data["group_ids"].pop(username, None)
         else:
             if not was_member and is_member:
-                logger.info("%s added the bot to the channel %s", username, chat.title)
+                logger.info(f"{username} added to the {chat.title} group")
                 context.bot_data.setdefault("channel_ids", dict())
                 context.bot_data["channel_ids"][username] = chat.id
             elif was_member and not is_member:
-                logger.info("%s removed the bot from the channel %s", username, chat.title)
+                logger.info(f"{username} left the {chat.title} channel")
                 context.bot_data["channel_ids"].pop(username, None)
 
     

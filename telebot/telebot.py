@@ -36,6 +36,7 @@ from listeners      import InternalCommandListener
 from consumers      import ConsumerManager
 
 from internal_commands import show_chats_command
+from internal_commands import start_command
 import botlog       
 
 class Telebot:
@@ -53,7 +54,7 @@ class Telebot:
         self.consumer_manager.initialize()
 
     def _init_handlers(self):
-        self._chat_member()
+        self._chatmember_callabck()
         self._internal_commands()
 
     def command(self, cmd_name):
@@ -106,7 +107,7 @@ class Telebot:
             return cmd_call
         return inner
 
-    def _chat_member(self):
+    def _chatmember_callabck(self):
         # Handle members joining/leaving chats.
         # Handle members joining/leaving chats.
         self.logger.debug('Enter inner of command decorator')
@@ -117,10 +118,10 @@ class Telebot:
     def _internal_commands(self):
         # Register internal commands not exposed to client
         self.logger.debug('Enter _internal_commands')
-        call_name, callback = ("show_chats", show_chats_command)
-        listener    = InternalCommandListener(call_name, callback, self.consumer_manager)
-        handler     = CommandHandler(call_name, listener.listener)
-        disp_ret    = self._dispatcher.add_handler(handler)
+        for call_name, callback in (("show_chats", show_chats_command), ("start", start_command)):
+            listener    = InternalCommandListener(call_name, callback, self.consumer_manager)
+            handler     = CommandHandler(call_name, listener.listener)
+            disp_ret    = self._dispatcher.add_handler(handler)
 
     def run(self):
         """Enter event loop
