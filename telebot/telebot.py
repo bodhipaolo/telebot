@@ -57,6 +57,11 @@ class Telebot:
         self._chatmember_callabck()
         self._internal_commands()
 
+    def get_chatid(username):
+        """ Return the chat id corresponding to the username parameter
+        """
+        return self._dispatcher.bot.bot_data
+
     def command(self, cmd_name):
         """It decorates Telegram-Bot user commands
         @param cmd_name is the name of command i.e.: "hello" for /hello
