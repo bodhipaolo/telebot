@@ -63,14 +63,14 @@ class Telechat:
         """ It wraps send_message API 
         """
 
-        self.logger.info(f"Sending message {chat_message} to user {self._update.effective_user.username}")
+        self.logger.info(f"Sending message {chat_message}")
         self._context.bot.send_message(chat_id=chat_id, text=chat_message)
 
 
     def _send_message_button(self, chat_message, chat_id, attach=None, syntax=None):
         """ It wraps the message reply
         """
-        self.logger.debug("Sending message '%s' for buttons" % (chat_message))
+        self.logger.info("Sending message '%s' for buttons" % (chat_message))
         keyboard = []
         for btnrow in attach:
             keyboard_line = []
@@ -85,11 +85,18 @@ class Telechat:
         self.logger.debug("Exiting from _send_message_button")
      
 
-    def send(self, chat_message, chat_id=None, attach=None, syntax=None):
+    def send(self, chat_message, username=None, attach=None, syntax=None):
         
-        if chat_id is None:
+        if username is None:
             chat_id = self._update.effective_chat.id
+        else: 
+            user_ids = self._context.bot_data.setdefault("user_ids", dict())
+            chat_id = user_ids[username]
+            if chat_id is None:
+                chat_id = self._update.effective_chat.id
+                self._send_message(f"User {username} unknown", chat_id)
 
+        self.logger.info(f"Send preparation for {username}/{chat_id}")
         if attach is None:
             self._send_message(chat_message, chat_id)
         else:

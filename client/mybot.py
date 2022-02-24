@@ -32,6 +32,14 @@ bot.owner   = "@bodhipaolo"
 
 logger = botlog.get_logger(__name__)
 
+# Command
+@bot.command("send")
+def ciao_command(chat, message, args):
+    logger.info(f"send_command called with args {args}")
+    if len(args) <= 2:
+        chat.send("Missing user parameters")
+    for username in args:
+        chat.send("Prova invio messaggio, ciauuu", username)
 
 # Command
 @bot.command("ciao")
