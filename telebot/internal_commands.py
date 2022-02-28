@@ -30,17 +30,23 @@ def show_chats_command(update: Update, context: CallbackContext) -> None:
         group_ids = ", ".join(str(gid) for gid in context.bot_data.setdefault("group_ids", dict()))
         channel_ids = ", ".join(str(cid) for cid in context.bot_data.setdefault("channel_ids", dict()))
         text = (
-            f"@{context.bot.username} is currently in a conversation with the user IDs {user_ids}."
-            f" Moreover it is a member of the groups with IDs {group_ids}."
-            f"and administrator in the channels with IDs {channel_ids}."
+            f"@{context.bot.username} bot is in contact with users {user_ids}."
+            f" It is a member of the groups {group_ids}"
+            f" and it is administrator in the channels {channel_ids}."
         )
         update.effective_message.reply_text(text)
 
 def start_command(update: Update, context: CallbackContext) -> None:
-    username = update.effective_user.username
-    chat = update.effective_chat
-
-    logger.info(f"{username} started the chat {chat.id}")
+    username    = update.effective_user.username
+    chat        = update.effective_chat
+    bot_ref     = context.bot_data.setdefault("bot_ref", dict()))
+    text = (
+        f"Name: {bot_ref['name]']}"
+        f"Owner: {bot_ref['owner]']}"
+        f"About: {bot_ref['about]']}"
+    )
+    update.effective_message.reply_text(text)
+    logger.info(f"{username} started the bot chat")
 
 
 

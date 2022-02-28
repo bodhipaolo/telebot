@@ -235,7 +235,7 @@ class InternalCommandListener(BotListener):
         self.name = call_name
 
     def listener(self, update: Update, context: CallbackContext):
-        """Command decoretor. It is a callback that intercept the event and map parameter for the client callback
+        """It is a callback that intercept the event and map parameter for the client callback
         """
         task = InternalCommandTask(self._user_callback, update, context)
         self._consumer_manager.queue.put(task)

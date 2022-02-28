@@ -39,22 +39,27 @@ from internal_commands import show_chats_command
 from internal_commands import start_command
 import botlog       
 
+logger = botlog.get_logger(__name__)
+
 class Telebot:
-    name            = 'Telegram Bot Wrapper'
-    owner           = None
-    about           = None
+    name            = 'Telebot: Telegram Bot Wrapper'
+    owner           = 'NA'
+    about           = 'A simple wrapper of python-telegram-bot library'
     _updater        = None
     _dispatcher     = None
 
     def __init__(self, api_key):
         self._updater           = Updater(token='5197893187:AAHu9nLtenZcCC9PQ_uWM05yvMd3OvJyA7w', use_context=True)
         self._dispatcher        = self._updater.dispatcher
-        self.logger             = botlog.get_logger(__name__)
+        self._dispatcher.bot_data.setdefault("bot_ref", dict()))
+        self._dispatcher.bot_data["bot_ref"]['name']   = self.name
+        self._dispatcher.bot_data["bot_ref"]['owner']  = self.owner
+        self._dispatcher.bot_data["bot_ref"]['about']  = self.about
         self.consumer_manager   = ConsumerManager()
         self.consumer_manager.initialize()
 
     def _init_handlers(self):
-        self._chatmember_callabck()
+        self._chatmember_callback()
         self._internal_commands()
 
     def get_chatid(username):
@@ -67,11 +72,11 @@ class Telebot:
         @param cmd_name is the name of command i.e.: "hello" for /hello
         """
         def inner(cmd_call):
-            self.logger.debug('Enter inner of command decorator')
+            logger.debug('Enter inner of command decorator')
             listener    = CommandListener(cmd_name, cmd_call, self.consumer_manager)
             handler     = CommandHandler(cmd_name, listener.listener)
             disp_ret    = self._dispatcher.add_handler(handler)
-            self.logger.debug('Exiting inner...')
+            logger.debug('Exiting inner...')
             return cmd_call
         return inner
 
@@ -80,7 +85,7 @@ class Telebot:
         @param regex is a string repressenting the regular expression for message matching
         """
         def inner(msg_call):
-            self.logger.debug('Enter inner of message_matches')
+            logger.debug('Enter inner of message_matches')
             listener    = MessageMatchListener(msg_call, regex, self.consumer_manager)
             handler     = MessageHandler(Filters.regex(regex) & (~Filters.command), listener.listener)
             #handler    = MessageHandler(Filters.text & (~Filters.command), task.listener) 
@@ -92,7 +97,7 @@ class Telebot:
         """It decorates Telegram-Bot message 
         """
         def inner(msg_call):
-            self.logger.debug('Enter inner of message_contains')
+            logger.debug('Enter inner of message_contains')
             listener    = MessageContainsListener(msg_call, token, self.consumer_manager)
             handler     = MessageHandler(Filters.text & (~Filters.command), listener.listener) 
             disp_ret    = self._dispatcher.add_handler(handler) 
@@ -104,25 +109,25 @@ class Telebot:
         @param cmd_name is the name of command i.e.: "hello" for /hello
         """
         def inner(cmd_call):
-            self.logger.debug('Enter inner of command decorator')
+            logger.debug('Enter inner of command decorator')
             listener    = CallbackListener(cmd_name, cmd_call, self.consumer_manager)
             handler     = CallbackQueryHandler(listener.listener, pattern = f"^{cmd_name}_*")
             disp_ret    = self._dispatcher.add_handler(handler)
-            self.logger.debug('Exiting inner...')
+            logger.debug('Exiting inner...')
             return cmd_call
         return inner
 
-    def _chatmember_callabck(self):
+    def _chatmember_callback(self):
         # Handle members joining/leaving chats.
         # Handle members joining/leaving chats.
-        self.logger.debug('Enter inner of command decorator')
+        logger.debug('Enter inner of command decorator')
         listener    = ChatMemberListener()
         handler     = ChatMemberHandler(listener.listener, ChatMemberHandler.ANY_CHAT_MEMBER)
         disp_ret    = self._dispatcher.add_handler(handler)
 
     def _internal_commands(self):
         # Register internal commands not exposed to client
-        self.logger.debug('Enter _internal_commands')
+        logger.debug('Enter _internal_commands')
         for call_name, callback in (("show_chats", show_chats_command), ("start", start_command)):
             listener    = InternalCommandListener(call_name, callback, self.consumer_manager)
             handler     = CommandHandler(call_name, listener.listener)
@@ -131,16 +136,16 @@ class Telebot:
     def run(self):
         """Enter event loop
         """
-        self.logger.info ("initialize default handlers")
+        logger.info ("initialize default handlers")
         self._init_handlers()
-        self.logger.info("%s Launch consumer threads..." % (__name__))
+        logger.info("%s Launch consumer threads..." % (__name__))
         self.consumer_manager.start()
-        self.logger.info("%s Enter event loop..." % (__name__))
+        logger.info("%s Enter event loop..." % (__name__))
         self._updater.start_polling()
         self._updater.idle()
-        self.logger.info("%s Telegram-bot handlers removed." % (__name__))
+        logger.info("%s Telegram-bot handlers removed." % (__name__))
         self.consumer_manager.stop()
-        self.logger.info("%s All consumer threads stopped." % (__name__))
+        logger.info("%s All consumer threads stopped." % (__name__))
 
 
 
